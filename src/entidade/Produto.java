@@ -15,7 +15,7 @@ public class Produto {
     private float preco;
     private ItemVenda itemVenda;
 
-    public Produto(int id, int quantidadeEstoque, String nome, String unidade, float preco, ItemVenda itemVenda) {
+    public Produto(int id, int quantidadeEstoque, String nome, String unidade, int preco, ItemVenda itemVenda) {
         this.id = id;
         this.quantidadeEstoque = quantidadeEstoque;
         this.nome = nome;
@@ -24,7 +24,9 @@ public class Produto {
         this.itemVenda = itemVenda;
     }
     
-    
+    public void definirQuantidadeDeEstoque(int novaQuantidade) {
+        this.quantidadeEstoque = novaQuantidade;
+    }
     
     public int obterId() {
         return id;

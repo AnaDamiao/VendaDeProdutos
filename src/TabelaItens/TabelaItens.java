@@ -5,17 +5,29 @@
  */
 package TabelaItens;
 
+import controller.ControladorProduto;
+import entidade.Produto;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author 06005296
  */
 public class TabelaItens extends javax.swing.JFrame {
 
+    private ControladorProduto controladorProduto;
+    private DefaultTableModel tableModel;
     /**
      * Creates new form TabelaItens
      */
     public TabelaItens() {
         initComponents();
+        controladorProduto = new ControladorProduto();
+        
+        tableModel = new DefaultTableModel(new Object[]{"ID", "Qtd Estoque", "Nome", "Unidade", "Preço"}, 0);
+        
+        tabelaItens.setModel(tableModel);
     }
 
     /**
@@ -92,16 +104,15 @@ public class TabelaItens extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(laValorTotal))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 36, Short.MAX_VALUE))
+                        .addComponent(laValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 52, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -111,33 +122,91 @@ public class TabelaItens extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancelar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancelar1)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCancelar1)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(laValorTotal))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addGap(30, 30, 30))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void LaCodigoProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LaCodigoProdutoActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_LaCodigoProdutoActionPerformed
 
     private void btnLocalizarCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLocalizarCodigoActionPerformed
-        // TODO add your handling code here:
+        try{
+            int idProduto = Integer.parseInt(LaCodigoProduto.getText());
+            
+            Produto produto = controladorProduto.selecionarProdutoPorId(idProduto);
+            
+            if (produto != null) {
+                adicionarProdutoNaTabela(produto);
+            }else{
+                JOptionPane.showMessageDialog(this, "Produto com ID: " + idProduto + ", não encontrado. \n Por favor, insira um ID válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            // Caso o usuário digite um ID inválido
+            JOptionPane.showMessageDialog(this, "ID não cadastrado, informe um ID válido.",
+                    "Erro de Entrada", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnLocalizarCodigoActionPerformed
 
     private void btnCancelar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelar1ActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelar1ActionPerformed
 
+    private void adicionarProdutoNaTabela(Produto produto){
+        if(produto.obterQuantidadeEstoque() > 0 ){
+            tableModel.addRow(new Object[]{
+                produto.obterId(),
+                produto.obterQuantidadeEstoque(),
+                produto.obterNome(),
+                produto.obterUnidade(),
+                produto.obterPreco(),
+            });
+            
+            produto.definirQuantidadeDeEstoque(produto.obterQuantidadeEstoque() - 1);
+
+            calcularValorTotal();
+            
+            controladorProduto.atualizarProduto(produto);
+        } else {
+        
+        }
+    }
+
+private void calcularValorTotal() {
+    double total = 0.0;
+
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        Number preco = (Number) tableModel.getValueAt(i, 4); // Coluna 3 é o preço
+//        int quantidade = (int) tableModel.getValueAt(i, 4);  // Coluna 4 é a quantidade;
+        
+        total += preco.doubleValue();
+    }
+
+    // Define o valor total no label
+    laValorTotal.setText(String.format("%.2f", total));
+}
+
+private void calcularQuantidadeEstoque(){
+    
+
+}
+
+
+
+    
     /**
      * @param args the command line arguments
      */
